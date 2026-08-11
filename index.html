@@ -152,13 +152,13 @@
 
         const generateId = (prefix) => `${prefix}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
-        // Initial Seed Configuration - Towing Minimum Margin changed to 15%
+        // Initial Seed Configuration - Towing Minimum Margin changed to 5%
         const initialCosts = {
             fuelSolar: 6800, fuelPertalite: 10000, fuelPertamax: 13500,
             adminFee: 50000, loadingFee: 150000, unloadingFee: 150000,
             driverTransportInnerCity: 15000, driverTransportOuterCityPerKm: 850, 
             insuranceRate: 0.2, ppnRate: 11, pphRate: 2, marginDefault: 20,
-            marginTowingDefault: 15 
+            marginTowingDefault: 5
         };
 
         const initialRegions = [
@@ -659,7 +659,7 @@
             );
         };
 
-        const calculatePricing = (route, fleet, costs, margin, customTowingMargin = 15) => {
+        const calculatePricing = (route, fleet, costs, margin, customTowingMargin = 5) => {
             const fuelPrice = fleet.fuelType === 'Solar' ? costs.fuelSolar : (fleet.fuelType === 'Pertamax' ? costs.fuelPertamax : costs.fuelPertalite);
             const bbmCost = fleet.fuelRatio > 0 ? (route.distanceKm / fleet.fuelRatio) * fuelPrice : 0;
             
@@ -696,7 +696,7 @@
             }
             
             const innerCityFee = costs.driverTransportInnerCity !== undefined ? costs.driverTransportInnerCity : 15000;
-            const outerCityRate = costs.driverTransportOuterCityPerKm !== undefined ? costs.driverTransportOuterCityPerKm : 850;
+            const outerCityRate = costs.driverTransportOuterCityPerKm !== undefined ? costs.driverTransportOuterCityPerKm : 650;
             
             let returnTransportFee = 0;
             if (route.distanceKm <= 30) {
@@ -724,7 +724,7 @@
 
             let marginPercent = margin;
             if (fleet.name.toLowerCase().includes('towing') || fleet.type === 'Special') {
-                const limitTowing = costs.marginTowingDefault !== undefined ? costs.marginTowingDefault : 15;
+                const limitTowing = costs.marginTowingDefault !== undefined ? costs.marginTowingDefault : 5;
                 marginPercent = Math.max(limitTowing, customTowingMargin);
             }
 
@@ -763,7 +763,7 @@
 
             const targetRevenue = 50000000;
             const targetProfit = 12000000;
-            const targetQuotations = 15;
+            const targetQuotations = 5;
             const targetCustomers = 8;
 
             const filteredQuotations = useMemo(() => {
@@ -1257,7 +1257,7 @@
 
         const MasterHargaView = ({ routes, setRoutes, fleets, costs, loadData, isSyncing }) => {
             const [margin, setMargin] = useState(costs.marginDefault);
-            const [towingMargin, setTowingMargin] = useState(costs.marginTowingDefault || 15); 
+            const [towingMargin, setTowingMargin] = useState(costs.marginTowingDefault || 5); 
             const [searchTerm, setSearchTerm] = useState('');
             const [selectedRouteIds, setSelectedRouteIds] = useState(new Set());
             const toast = useToast();
@@ -1442,7 +1442,7 @@
                                 <Input label="Margin Default Komersial" type="number" value={margin} onChange={e=>setMargin(Number(e.target.value))} suffix="%" />
                             </div>
                             <div>
-                                <Input label={`Margin Towing Khusus (Min ${costs.marginTowingDefault || 15}%)`} type="number" min={costs.marginTowingDefault || 15} value={towingMargin} onChange={e=>setTowingMargin(Math.max(costs.marginTowingDefault || 15, Number(e.target.value)))} suffix="%" />
+                                <Input label={`Margin Towing Khusus (Min ${costs.marginTowingDefault || 5}%)`} type="number" min={costs.marginTowingDefault || 5} value={towingMargin} onChange={e=>setTowingMargin(Math.max(costs.marginTowingDefault || 5, Number(e.target.value)))} suffix="%" />
                             </div>
                             <div className="flex flex-col justify-end">
                                 <Input label="Cari Rute" placeholder="Filter kota asal/tujuan..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} />
@@ -2166,7 +2166,7 @@
                                         <Input label="PPN (Pajak Pertambahan Nilai)" type="number" name="ppnRate" value={formData.ppnRate} onChange={handleChange} suffix="%" required />
                                         <Input label="PPh 23 (Jasa Transport)" type="number" name="pphRate" value={formData.pphRate} onChange={handleChange} suffix="%" required />
                                         <Input label="Target Margin Keuntungan" type="number" name="marginDefault" value={formData.marginDefault} onChange={handleChange} suffix="%" required />
-                                        <Input label="Margin Khusus Towing (Min 12%)" type="number" name="marginTowingDefault" value={formData.marginTowingDefault !== undefined ? formData.marginTowingDefault : 15} onChange={handleChange} suffix="%" min="15" required />
+                                        <Input label="Margin Khusus Towing (Min 5%)" type="number" name="marginTowingDefault" value={formData.marginTowingDefault !== undefined ? formData.marginTowingDefault : 5} onChange={handleChange} suffix="%" min="5" required />
                                     </div>
                                 </div>
                             </div>
@@ -2185,7 +2185,7 @@
             const [fleetId, setFleetId] = useState('');
             const [customerId, setCustomerId] = useState('');
             const [margin, setMargin] = useState(costs.marginDefault);
-            const [towingMargin, setTowingMargin] = useState(costs.marginTowingDefault || 15); 
+            const [towingMargin, setTowingMargin] = useState(costs.marginTowingDefault || 5); 
             const [driverName, setDriverName] = useState('');
             const [signeeName, setSigneeName] = useState('Andi Wijaya');
             const [signeePosition, setSigneePosition] = useState('Director of Operations');
@@ -2193,7 +2193,7 @@
             
             const toast = useToast();
 
-            const limitTowing = costs.marginTowingDefault !== undefined ? costs.marginTowingDefault : 15;
+            const limitTowing = costs.marginTowingDefault !== undefined ? costs.marginTowingDefault : 5;
 
             const isSelectedFleetTowing = useMemo(() => {
                 const fleet = fleets.find(f => f.id === fleetId);
@@ -2504,7 +2504,7 @@
                         };
                     }
 
-                    const towingMarginValue = customizedParams ? Math.max(costs.marginTowingDefault || 15, customizedParams.margin) : (costs.marginTowingDefault || 15);
+                    const towingMarginValue = customizedParams ? Math.max(costs.marginTowingDefault || 5, customizedParams.margin) : (costs.marginTowingDefault || 5);
                     const calc = calculatePricing(foundRoute, matchedFleet, costs, currentMargin, towingMarginValue);
                     return {
                         label: fItem.label,
@@ -2988,7 +2988,7 @@
                                         <React.Fragment>
                                             <Input label="Nama Klien/Proyek" value={editClient} onChange={e=>setEditClient(e.target.value)} />
                                             {activeQuote.fleet.toLowerCase().includes('towing') ? (
-                                                <Input label="Margin Towing Khusus (Min 15%)" type="number" min="15" value={editMargin} onChange={e=>setEditMargin(Math.max(15, Number(e.target.value)))} suffix="%" />
+                                                <Input label="Margin Towing Khusus (Min 5%)" type="number" min="5" value={editMargin} onChange={e=>setEditMargin(Math.max(5, Number(e.target.value)))} suffix="%" />
                                             ) : (
                                                 <Input label="Atur Profit Margin" type="number" value={editMargin} onChange={e=>setEditMargin(Number(e.target.value))} suffix="%" />
                                             )}
